@@ -91,11 +91,24 @@ with right:
         scheduler = Scheduler(owner=owner)
         pet_filter = None if filter_pet == "All pets" else filter_pet
         scheduler.build_plan(pet_filter=pet_filter, show_completed=not hide_done)
+        st.session_state.last_plan      = scheduler.plan
+        st.session_state.last_conflicts = scheduler.conflicts
+        st.session_state.last_scheduler = scheduler
+
+    # ── Render plan from session state so it survives reruns ──────────────────
+    if "last_plan" in st.session_state and st.session_state.last_plan is not None:
+        scheduler = st.session_state.last_scheduler
+
+        # Re-run build so completion status is always fresh
+        pet_filter = None if filter_pet == "All pets" else filter_pet
+        scheduler.build_plan(pet_filter=pet_filter, show_completed=not hide_done)
+        st.session_state.last_plan      = scheduler.plan
+        st.session_state.last_conflicts = scheduler.conflicts
 
         if not scheduler.plan:
             st.info("No tasks scheduled for today with the current filters.")
         else:
-            # ── Conflict warnings (shown before the plan) ──────────────────────
+            # ── Conflict warnings ──────────────────────────────────────────────
             if scheduler.conflicts:
                 for task_a, task_b in scheduler.conflicts:
                     st.warning(
@@ -115,10 +128,8 @@ with right:
                 else scheduler.plan
             )
 
-            # ── Priority badge colours ─────────────────────────────────────────
             badge = {"high": "🔴", "medium": "🟡", "low": "🟢"}
 
-            # ── Render each task as a card ─────────────────────────────────────
             for i, (pet, task) in enumerate(ordered, start=1):
                 status_icon = "✅" if task.completed else "⬜"
                 recur_label = f" ({task.recurrence})" if task.recurrence != "none" else ""
@@ -137,7 +148,6 @@ with right:
                     with col_b:
                         if not task.completed:
                             if st.button("Mark done", key=f"done_{i}_{task.title}"):
-                                # Use complete_task so recurring tasks auto-schedule
                                 for p in owner.get_pets():
                                     if task in p.get_tasks():
                                         p.complete_task(task)

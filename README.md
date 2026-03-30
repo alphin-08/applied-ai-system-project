@@ -18,8 +18,8 @@ A smart pet care scheduling app built with Python and Streamlit. PawPal+ helps b
 
 ## Demo
 
-<a href="/course_images/ai110/pawpal_screenshot.png" target="_blank">
-  <img src='/course_images/ai110/pawpal_screenshot.png' title='PawPal App' width='' alt='PawPal App' class='center-block' />
+<a href="/course_images/ai110/pawpaldemo.png" target="_blank">
+  <img src='/course_images/ai110/pawpaldemo.png' title='PawPal App' width='' alt='PawPal App' class='center-block' />
 </a>
 
 ---
