@@ -4,8 +4,27 @@
 
 **a. Initial design**
 
-- Briefly describe your initial UML design.
-- What classes did you include, and what responsibilities did you assign to each?
+The three core actions a user should be able to perform in PawPal+:
+
+1. **Add a pet** — The user registers a pet by providing its name, species, age, and any special health notes. This creates a profile that all future tasks and schedules are tied to, making it the foundation of the entire system.
+
+2. **Schedule a care task** — The user creates a task for a specific pet (such as a walk, feeding, medication dose, or vet appointment), setting a date, time, and priority level. This is the primary daily interaction — building out the pet's care calendar.
+
+3. **View today's tasks** — The user sees a prioritized list of all care tasks due today across all their pets. The system sorts tasks by urgency and type so the owner always knows what needs attention first.
+
+The three main objects and their responsibilities:
+
+**Pet**
+- Attributes: `name` (str), `species` (str), `age` (int), `health_notes` (str), `tasks` (list of CareTask)
+- Methods: `add_task(task)` — attaches a CareTask to this pet; `get_tasks()` — returns all tasks for this pet
+
+**CareTask**
+- Attributes: `title` (str), `task_type` (str: "walk" | "feeding" | "medication" | "appointment"), `duration_minutes` (int), `priority` (str: "low" | "medium" | "high"), `scheduled_time` (datetime), `completed` (bool)
+- Methods: `mark_complete()` — flips `completed` to True; `is_due_today()` — checks if `scheduled_time` falls on today's date; `__repr__()` — returns a readable summary string
+
+**Scheduler**
+- Attributes: `pet` (Pet), `date` (date), `plan` (list of CareTask)
+- Methods: `build_plan()` — filters today's tasks and sorts them by priority then time; `get_next_task()` — returns the top incomplete task; `explain_plan()` — returns a human-readable string describing the ordered schedule and why each task was placed where it was
 
 **b. Design changes**
 
