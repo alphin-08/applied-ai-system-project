@@ -5,6 +5,7 @@ classDiagram
         +List~Pet~ pets
         +add_pet(pet)
         +get_pets()
+        +get_pet_by_name(name)
     }
 
     class Pet {
@@ -15,6 +16,9 @@ classDiagram
         +List~CareTask~ tasks
         +add_task(task)
         +get_tasks()
+        +get_tasks_by_status(completed)
+        +complete_task(task)
+        +expand_recurring_tasks(days_ahead)
     }
 
     class CareTask {
@@ -24,20 +28,27 @@ classDiagram
         +String priority
         +datetime scheduled_time
         +bool completed
+        +String recurrence
         +mark_complete()
         +is_due_today()
+        +next_occurrence()
+        +end_time()
+        +conflicts_with(other)
         +__repr__()
     }
 
     class Scheduler {
-        +Pet pet
-        +date date
-        +List~CareTask~ plan
-        +build_plan()
+        +Owner owner
+        +List plan
+        +List conflicts
+        +build_plan(pet_filter, show_completed)
         +get_next_task()
+        +get_tasks_by_time()
         +explain_plan()
+        -_detect_conflicts()
     }
 
     Owner "1" --> "0..*" Pet : owns
     Pet "1" --> "0..*" CareTask : has
-    Scheduler "1" --> "1" Pet : schedules for
+    Scheduler "1" --> "1" Owner : schedules for
+    CareTask ..> CareTask : next_occurrence()

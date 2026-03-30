@@ -20,7 +20,7 @@ mochi.add_task(CareTask("Morning walk",      "walk",        30, "high",   t(7, 0
 
 luna.add_task(CareTask("Lunch feeding",      "feeding",     10, "medium", t(12, 0)))
 luna.add_task(CareTask("Vet check-up",       "appointment", 60, "high",   t(14, 0)))
-# Thyroid medication at 07:10 deliberately overlaps Morning walk (07:00-07:30)
+# Thyroid medication at 07:10 overlaps Morning walk (07:00-07:30)
 luna.add_task(CareTask("Thyroid medication", "medication",   5, "high",   t(7, 10)))
 
 scheduler = Scheduler(owner=owner)

@@ -35,13 +35,13 @@ The design uses four classes, each with a single clear responsibility:
 
 The scheduler considers three constraints when building a daily plan:
 
-1. **Priority level** (`high`, `medium`, `low`) — the most heavily weighted constraint. A high-priority task always appears before medium or low tasks regardless of when it is scheduled on the clock. This ensures critical care like medication is never buried under routine tasks.
+1. **Priority level** is the most important rule. A high priority task will always show up before medium or low tasks no matter what time it is supposed to happen. We set it up this way so that crucial things like giving medication never get lost under everyday chores.
 
-2. **Scheduled time** — used as a tiebreaker within the same priority group. If two high-priority tasks exist, the one scheduled earlier in the day appears first, keeping the plan naturally readable.
+2. **Scheduled time** works as a tiebreaker when tasks have the exact same priority. This means the earlier task will be listed first to keep the plan easy to read.
 
-3. **Time window overlap** — the scheduler checks whether any two tasks' start-to-end windows intersect using interval intersection logic. It does not block the plan, but surfaces a warning so the owner can decide how to resolve it.
+3. **Time window overlap** is when the app checks if the times for any tasks clash with each other. It will give you a warning instead of blocking you from making the plan.
 
-Priority was chosen as the dominant constraint because the core risk in pet care is missing something critical — a missed medication is far more consequential than a missed walk. Conflict detection was kept as a warning rather than a hard block to avoid making the app frustrating; real-life schedules are messy and the owner should stay in control.
+We made priority the main rule because missing an important medication is much worse than skipping a normal walk. We chose to use warnings for schedule conflicts instead of stopping you completely because real life gets messy, and the owner should always remain in control.
 
 **b. Tradeoffs**
 
