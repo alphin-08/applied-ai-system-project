@@ -4,6 +4,16 @@ A smart pet care scheduling app built with Python and Streamlit. PawPal+ helps b
 
 ---
 
+## Completed Challenges
+
+**Challenge 3: Advanced Priority Scheduling and UI**
+
+- Added a `priority` field (`low`, `medium`, `high`) to the `CareTask` class
+- Updated `Scheduler.build_plan()` to sort by priority first, then by scheduled time as a tiebreaker — so high-priority tasks like medication always surface before low-priority ones regardless of clock time
+- Added emoji color-coding to every task card in the Streamlit UI: 🔴 High, 🟡 Medium, 🟢 Low
+
+---
+
 ## Features
 
 - **Register multiple pets** — add dogs, cats, or other animals with name, age, species, and health notes, all persisted across interactions via Streamlit session state.
