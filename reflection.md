@@ -33,13 +33,19 @@ The design uses four classes, each with a single clear responsibility:
 
 **a. Constraints and priorities**
 
-- What constraints does your scheduler consider (for example: time, priority, preferences)?
-- How did you decide which constraints mattered most?
+The scheduler considers three constraints when building a daily plan:
+
+1. **Priority level** (`high`, `medium`, `low`) — the most heavily weighted constraint. A high-priority task always appears before medium or low tasks regardless of when it is scheduled on the clock. This ensures critical care like medication is never buried under routine tasks.
+
+2. **Scheduled time** — used as a tiebreaker within the same priority group. If two high-priority tasks exist, the one scheduled earlier in the day appears first, keeping the plan naturally readable.
+
+3. **Time window overlap** — the scheduler checks whether any two tasks' start-to-end windows intersect using interval intersection logic. It does not block the plan, but surfaces a warning so the owner can decide how to resolve it.
+
+Priority was chosen as the dominant constraint because the core risk in pet care is missing something critical — a missed medication is far more consequential than a missed walk. Conflict detection was kept as a warning rather than a hard block to avoid making the app frustrating; real-life schedules are messy and the owner should stay in control.
 
 **b. Tradeoffs**
 
-- Describe one tradeoff your scheduler makes.
-- Why is that tradeoff reasonable for this scenario?
+The scheduler sorts tasks by priority first and then by time. This means a high priority task at 6 PM will always show up before a medium priority task at 7 AM, even if the morning task actually happens first in the real world. We made this choice on purpose because urgency matters more than the clock in a pet care app. Missing a medication is much worse than missing a walk. The app also has a second feature that sorts tasks strictly by time, so the owner can easily see what is most critical along with what is coming up next. Most users need both options, and separating them into two lists is much clearer than trying to mix priority and time together.
 
 ---
 
