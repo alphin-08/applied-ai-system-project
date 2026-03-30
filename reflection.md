@@ -12,19 +12,15 @@ The three core actions a user should be able to perform in PawPal+:
 
 3. **View today's tasks** — The user sees a prioritized list of all care tasks due today across all their pets. The system sorts tasks by urgency and type so the owner always knows what needs attention first.
 
-The three main objects and their responsibilities:
+The design uses four classes, each with a single clear responsibility:
 
-**Pet**
-- Attributes: `name` (str), `species` (str), `age` (int), `health_notes` (str), `tasks` (list of CareTask)
-- Methods: `add_task(task)` — attaches a CareTask to this pet; `get_tasks()` — returns all tasks for this pet
+**Owner** is the top-level user of the system. It holds the owner's name and email, and maintains a list of their pets. Its responsibility is to act as the entry point — all pets and their care flows through the owner. It was implemented as a regular class because it manages state and behavior beyond simple data storage.
 
-**CareTask**
-- Attributes: `title` (str), `task_type` (str: "walk" | "feeding" | "medication" | "appointment"), `duration_minutes` (int), `priority` (str: "low" | "medium" | "high"), `scheduled_time` (datetime), `completed` (bool)
-- Methods: `mark_complete()` — flips `completed` to True; `is_due_today()` — checks if `scheduled_time` falls on today's date; `__repr__()` — returns a readable summary string
+**Pet** represents a registered animal in the system. It stores the pet's name, species, age, and any health notes, and holds the full list of CareTask objects assigned to it. Its responsibility is to be the central data record for one pet — a container that tasks are attached to and retrieved from. It was implemented as a Python dataclass to keep the definition clean and auto-generate the constructor.
 
-**Scheduler**
-- Attributes: `pet` (Pet), `date` (date), `plan` (list of CareTask)
-- Methods: `build_plan()` — filters today's tasks and sorts them by priority then time; `get_next_task()` — returns the top incomplete task; `explain_plan()` — returns a human-readable string describing the ordered schedule and why each task was placed where it was
+**CareTask** represents one unit of care — a walk, feeding, medication dose, or vet appointment. It stores the task title, type, duration, priority level, scheduled time, and completion status. Its responsibility is to model a single schedulable event with enough information for the Scheduler to sort and explain it. It was also implemented as a dataclass, with `completed` defaulting to `False` so every new task starts as pending.
+
+**Scheduler** is the logic layer. It takes a Pet and a target date, filters the pet's tasks down to those due that day, and sorts them by priority and time into an ordered plan. Its responsibility is entirely algorithmic — it does not store data permanently, only produces and exposes a plan for a given day. It was implemented as a regular class because its constructor takes behavioral arguments (a pet and a date) rather than purely describing data.
 
 **b. Design changes**
 
