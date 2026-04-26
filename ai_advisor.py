@@ -1,19 +1,31 @@
 """
-Claude API layer for the PawPal+ RAG pipeline.
+Gemini API layer for the PawPal+ RAG pipeline.
 
 generate_care_advice() is the single public function.
 It receives the pet profile, today's scheduled plan, any detected conflicts,
-and the retrieved care guidelines, then calls Claude to produce a short
+and the retrieved care guidelines, then calls Gemini to produce a short
 personalised care summary.
 """
 
 import os
-import anthropic
+import google.generativeai as genai
 from dotenv import load_dotenv
 from pawpal_system import CareTask, Pet
 
 load_dotenv()
-_client = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY from environment
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+
+_model = genai.GenerativeModel(
+    model_name="gemini-2.0-flash-lite",
+    system_instruction=(
+        "You are a knowledgeable and caring pet care advisor. "
+        "You will be given evidence-based care guidelines retrieved specifically "
+        "for the pet described, followed by their schedule for today. "
+        "Write a short, personalised care summary that is grounded in the "
+        "provided guidelines. Do not give generic advice that ignores the "
+        "retrieved guidelines or the schedule."
+    ),
+)
 
 
 def _build_schedule_summary(
@@ -21,7 +33,7 @@ def _build_schedule_summary(
     plan: list[tuple[Pet, CareTask]],
     conflicts: list[tuple[CareTask, CareTask]],
 ) -> str:
-    """Format today's schedule as plain text for the Claude prompt."""
+    """Format today's schedule as plain text for the Gemini prompt."""
     if not plan:
         return f"No tasks scheduled for {pet.name} today."
 
@@ -57,7 +69,7 @@ def generate_care_advice(
     retrieved_context: str,
 ) -> str:
     """
-    Call Claude to generate personalised care advice for a pet's daily schedule.
+    Call Gemini to generate personalised care advice for a pet's daily schedule.
 
     Parameters
     ----------
@@ -70,7 +82,7 @@ def generate_care_advice(
     """
     schedule_summary = _build_schedule_summary(pet, plan, conflicts)
 
-    user_message = (
+    prompt = (
         f"Pet profile:\n"
         f"  Name:         {pet.name}\n"
         f"  Species:      {pet.species}\n"
@@ -84,20 +96,8 @@ def generate_care_advice(
     )
 
     try:
-        response = _client.messages.create(
-            model="claude-opus-4-7",
-            max_tokens=512,
-            system=(
-                "You are a knowledgeable and caring pet care advisor. "
-                "You will be given evidence-based care guidelines retrieved specifically "
-                "for the pet described, followed by their schedule for today. "
-                "Write a short, personalised care summary that is grounded in the "
-                "provided guidelines. Do not give generic advice that ignores the "
-                "retrieved guidelines or the schedule."
-            ),
-            messages=[{"role": "user", "content": user_message}],
-        )
-        return response.content[0].text
+        response = _model.generate_content(prompt)
+        return response.text
 
-    except anthropic.APIError as e:
+    except Exception as e:
         return f"Could not generate care advice: {e}"
