@@ -2,6 +2,8 @@
 
 A smart, AI-powered pet care scheduling app built with Python and Streamlit.
 
+Link to Demo: https://www.loom.com/share/994bcff111974d6796f09161929fcac4
+
 ---
 
 ## Original Project (Modules 1–3): PawPal+
