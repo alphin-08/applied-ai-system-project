@@ -4,6 +4,9 @@ A smart, AI-powered pet care scheduling app built with Python and Streamlit.
 
 Link to Demo: https://www.loom.com/share/994bcff111974d6796f09161929fcac4
 
+**Note:**
+A quick note on how the AI actually works. In the live demo, I said the AI takes the pet details and writes advice. I skipped a very important piece of the puzzle. Before Gemini ever sees the information, the app runs a special search. I wrote a file containing a custom database of care rules based on species, age, task, and health. When you click the build schedule button, the app searches that database and pulls only the facts meant for your specific pet. It bundles those rules with your schedule and sends everything to Gemini. The AI does not make decisions from scratch. It just uses the exact facts the search tool found to write the final summary. That specific search step is what makes this a true RAG system instead of just a normal API call.
+
 ---
 
 ## Original Project (Modules 1–3): PawPal+
