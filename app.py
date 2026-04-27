@@ -1,6 +1,8 @@
 import streamlit as st
 from datetime import datetime
 from pawpal_system import CareTask, Owner, Pet, Scheduler
+from retriever import retrieve_context
+from ai_advisor import generate_care_advice
 
 st.set_page_config(page_title="PawPal+", page_icon="🐾", layout="wide")
 
@@ -95,6 +97,24 @@ with right:
         st.session_state.last_conflicts = scheduler.conflicts
         st.session_state.last_scheduler = scheduler
 
+        if scheduler.plan:
+            with st.spinner("Generating AI care advice..."):
+                ai_summaries = {}
+                pets_in_plan = list({pet.name: pet for pet, _ in scheduler.plan}.values())
+                for pet in pets_in_plan:
+                    pet_plan = [(p, t) for p, t in scheduler.plan if p == pet]
+                    pet_tasks = [t for _, t in pet_plan]
+                    pet_conflicts = [
+                        (a, b) for a, b in scheduler.conflicts
+                        if a in pet_tasks or b in pet_tasks
+                    ]
+                    task_types = [t.task_type for _, t in pet_plan]
+                    context = retrieve_context(pet, task_types)
+                    ai_summaries[pet.name] = generate_care_advice(
+                        pet, pet_plan, pet_conflicts, context
+                    )
+                st.session_state.ai_summaries = ai_summaries
+
     # ── Render plan from session state so it survives reruns ──────────────────
     if "last_plan" in st.session_state and st.session_state.last_plan is not None:
         scheduler = st.session_state.last_scheduler
@@ -153,3 +173,11 @@ with right:
                                         p.complete_task(task)
                                         break
                                 st.rerun()
+
+# ── AI Care Advisor ───────────────────────────────────────────────────────────
+if "ai_summaries" in st.session_state and st.session_state.ai_summaries:
+    st.divider()
+    st.subheader("AI Care Advisor")
+    for pet_name, summary in st.session_state.ai_summaries.items():
+        with st.expander(f"Care summary for {pet_name}", expanded=True):
+            st.markdown(summary)
