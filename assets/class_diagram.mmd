@@ -48,7 +48,33 @@ classDiagram
         -_detect_conflicts()
     }
 
+    class Retriever {
+        <<module>>
+        +retrieve_context(pet, task_types) String
+    }
+
+    class KnowledgeBase {
+        <<module pet_care_kb.py>>
+        +SPECIES_GUIDELINES Dict
+        +AGE_GUIDELINES Dict
+        +TASK_GUIDELINES Dict
+        +HEALTH_GUIDELINES Dict
+        +age_bracket(species, age) String
+    }
+
+    class AIAdvisor {
+        <<module ai_advisor.py>>
+        +generate_care_advice(pet, plan, conflicts, retrieved_context) String
+        -_build_schedule_summary(pet, plan, conflicts) String
+        -_model GenerativeModel
+    }
+
     Owner "1" --> "0..*" Pet : owns
     Pet "1" --> "0..*" CareTask : has
     Scheduler "1" --> "1" Owner : schedules for
     CareTask ..> CareTask : next_occurrence()
+    Retriever ..> Pet : reads profile
+    Retriever ..> KnowledgeBase : looks up
+    AIAdvisor ..> Pet : reads profile
+    AIAdvisor ..> CareTask : reads schedule
+    AIAdvisor ..> Retriever : receives context from
