@@ -31,7 +31,7 @@ print("  1. SORT BY TIME  (tasks were added out of order above)")
 print("=" * 60)
 scheduler.build_plan()
 for pet, task in scheduler.get_tasks_by_time():
-    print(f"  {task.scheduled_time.strftime('%H:%M')}  [{pet.name:5}] {task.title}")
+    print(f"  {task.scheduled_time.strftime('%I:%M %p').lstrip('0')}  [{pet.name:5}] {task.title}")
 print()
 
 # ── 2. FILTER BY PET ─────────────────────────────────────────────────────────

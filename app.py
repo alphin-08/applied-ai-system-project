@@ -1,8 +1,18 @@
 import streamlit as st
-from datetime import datetime
+from datetime import datetime, time as _time
 from pawpal_system import CareTask, Owner, Pet, Scheduler
 from retriever import retrieve_context
 from ai_advisor import generate_care_advice
+
+# 12-hour time options in 15-minute increments for the task time picker
+_TIME_LABELS = []
+_TIME_OBJECTS = []
+for _h in range(24):
+    for _m in (0, 15, 30, 45):
+        _period = "AM" if _h < 12 else "PM"
+        _hour12 = _h % 12 or 12
+        _TIME_LABELS.append(f"{_hour12}:{_m:02d} {_period}")
+        _TIME_OBJECTS.append(_time(_h, _m))
 
 st.set_page_config(page_title="PawPal+", page_icon="🐾", layout="wide")
 
@@ -61,10 +71,13 @@ with left:
         pet_names    = [p.name for p in owner.get_pets()]
         selected_pet = st.selectbox("For which pet?", pet_names)
         task_title   = st.text_input("Task title", value="Morning walk")
-        task_type    = st.selectbox("Task type", ["walk", "feeding", "medication", "appointment"])
+        task_type    = st.selectbox("Task type", ["walk", "feeding", "medication", "appointment", "other"])
         priority     = st.selectbox("Priority", ["low", "medium", "high"], index=2)
         duration     = st.number_input("Duration (minutes)", min_value=1, max_value=240, value=20)
-        task_time    = st.time_input("Scheduled time", value=datetime.now().replace(second=0, microsecond=0))
+        _now = datetime.now()
+        _default_idx = min(_now.hour * 4 + _now.minute // 15, len(_TIME_LABELS) - 1)
+        _selected = st.selectbox("Scheduled time", _TIME_LABELS, index=_default_idx)
+        task_time = _TIME_OBJECTS[_TIME_LABELS.index(_selected)]
         recurrence   = st.selectbox("Recurrence", ["none", "daily", "weekly"])
 
         if st.button("Add task", use_container_width=True):
@@ -133,9 +146,9 @@ with right:
                 for task_a, task_b in scheduler.conflicts:
                     st.warning(
                         f"**Schedule conflict:** '{task_a.title}' "
-                        f"({task_a.scheduled_time.strftime('%H:%M')}–{task_a.end_time().strftime('%H:%M')}) "
+                        f"({task_a.scheduled_time.strftime('%I:%M %p').lstrip('0')}–{task_a.end_time().strftime('%I:%M %p').lstrip('0')}) "
                         f"overlaps with '{task_b.title}' "
-                        f"({task_b.scheduled_time.strftime('%H:%M')}–{task_b.end_time().strftime('%H:%M')}). "
+                        f"({task_b.scheduled_time.strftime('%I:%M %p').lstrip('0')}–{task_b.end_time().strftime('%I:%M %p').lstrip('0')}). "
                         f"Consider rescheduling one of these tasks."
                     )
             else:
@@ -162,7 +175,7 @@ with right:
                             f"{badge[task.priority]} `{task.priority.upper()}` &nbsp;|&nbsp; "
                             f"**{pet.name}** &nbsp;|&nbsp; "
                             f"{task.task_type} &nbsp;|&nbsp; "
-                            f"{task.scheduled_time.strftime('%H:%M')}–{task.end_time().strftime('%H:%M')} "
+                            f"{task.scheduled_time.strftime('%I:%M %p').lstrip('0')}–{task.end_time().strftime('%I:%M %p').lstrip('0')} "
                             f"({task.duration_minutes} min)"
                         )
                     with col_b:

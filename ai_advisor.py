@@ -45,7 +45,7 @@ def _build_schedule_summary(
     for i, (_, task) in enumerate(plan, 1):
         lines.append(
             f"  {i}. [{task.priority.upper()}] {task.title} ({task.task_type})"
-            f" — {task.scheduled_time.strftime('%H:%M')}–{task.end_time().strftime('%H:%M')}"
+            f" — {task.scheduled_time.strftime('%I:%M %p').lstrip('0')}–{task.end_time().strftime('%I:%M %p').lstrip('0')}"
             f" ({task.duration_minutes} min)"
         )
 
@@ -54,9 +54,9 @@ def _build_schedule_summary(
         for a, b in conflicts:
             lines.append(
                 f"  • '{a.title}' "
-                f"({a.scheduled_time.strftime('%H:%M')}–{a.end_time().strftime('%H:%M')})"
+                f"({a.scheduled_time.strftime('%I:%M %p').lstrip('0')}–{a.end_time().strftime('%I:%M %p').lstrip('0')})"
                 f" overlaps with '{b.title}' "
-                f"({b.scheduled_time.strftime('%H:%M')}–{b.end_time().strftime('%H:%M')})"
+                f"({b.scheduled_time.strftime('%I:%M %p').lstrip('0')}–{b.end_time().strftime('%I:%M %p').lstrip('0')})"
             )
 
     return "\n".join(lines)

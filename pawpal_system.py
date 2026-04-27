@@ -52,7 +52,7 @@ class CareTask:
     def __repr__(self) -> str:
         """Return a readable one-line summary of the task including priority, type, time, and status."""
         status = "done" if self.completed else "pending"
-        time_str = self.scheduled_time.strftime("%H:%M")
+        time_str = self.scheduled_time.strftime("%I:%M %p").lstrip("0")
         recur = f", {self.recurrence}" if self.recurrence != "none" else ""
         return (
             f"[{self.priority.upper()}] {self.title} "
@@ -205,7 +205,7 @@ class Scheduler:
         lines = [f"Daily care plan for {self.owner.name}:\n"]
         for i, (pet, task) in enumerate(self.plan, start=1):
             status = "[x]" if task.completed else "[ ]"
-            time_str = task.scheduled_time.strftime("%H:%M")
+            time_str = task.scheduled_time.strftime("%I:%M %p").lstrip("0")
             reason = (
                 f"priority={task.priority}"
                 if task.priority == "high"
