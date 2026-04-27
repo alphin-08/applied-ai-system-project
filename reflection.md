@@ -1,5 +1,7 @@
 # PawPal+ Project Reflection
 
+ **Note:** This reflection covers the original PawPal+ project built during Modules 1–3, before any AI was added. It documents the initial system design, scheduling logic, and testing decisions for the pure Python scheduling engine. For reflections on the AI implementation, see `model_card.md`.
+
 ## 1. System Design
 
 **a. Initial design**
